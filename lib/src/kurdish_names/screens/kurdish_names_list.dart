@@ -25,7 +25,14 @@ class KurdishNamesList extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.all(20),
-            child: Text('title '),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Gender '),
+                Text('Sort by '),
+                Text('Limit '),
+              ],
+            ),
           ),
           Expanded(
             child: Container(
@@ -47,6 +54,9 @@ class KurdishNamesList extends StatelessWidget {
                         itemCount: snapshot.data!.names.length,
                         itemBuilder: (context, index) {
                           return ExpansionTile(
+                            leading: Text(snapshot
+                                .data!.names[index].positive_votes
+                                .toString()),
                             title: Text(snapshot.data!.names[index].name),
                             children: [Text(snapshot.data!.names[index].desc)],
                           );
