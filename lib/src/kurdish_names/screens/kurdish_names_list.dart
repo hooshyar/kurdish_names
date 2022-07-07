@@ -77,9 +77,10 @@ class _KurdishNamesListState extends State<KurdishNamesList> {
                                   ElevatedButton.icon(
                                       onPressed: () async {
                                         await _namesService
-                                            .voteUp(
+                                            .vote(
                                                 name_id:
-                                                    _name.nameId.toString())
+                                                    _name.nameId.toString(),
+                                                isPositive: true)
                                             .then((value) {
                                           setState(() {});
                                         });
@@ -90,7 +91,18 @@ class _KurdishNamesListState extends State<KurdishNamesList> {
                                       label: Text(
                                           _name.positive_votes.toString())),
                                   ElevatedButton.icon(
-                                      onPressed: () {},
+                                      onPressed: () async {
+                                        await _namesService
+                                            .vote(
+                                                name_id:
+                                                    _name.nameId.toString(),
+                                                isPositive: false)
+                                            .then(
+                                          (value) {
+                                            setState(() {});
+                                          },
+                                        );
+                                      },
                                       style: ElevatedButton.styleFrom(
                                           primary: Colors.red),
                                       icon: Icon(Icons.thumb_down_sharp),
