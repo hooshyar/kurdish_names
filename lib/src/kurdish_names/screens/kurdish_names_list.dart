@@ -5,17 +5,18 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:kurdish_names/src/kurdish_names/models/names_data_model.dart';
 import 'package:kurdish_names/src/kurdish_names/services/kurdish_names_service.dart';
 
-class KurdishNamesList extends StatelessWidget {
+class KurdishNamesList extends StatefulWidget {
   KurdishNamesList({Key? key}) : super(key: key);
 
+  @override
+  State<KurdishNamesList> createState() => _KurdishNamesListState();
+}
+
+class _KurdishNamesListState extends State<KurdishNamesList> {
   KurdishNamesService _namesService = KurdishNamesService();
-//TODO: create the datamodel : done
 
-//TODO: create  a class for the kurdish names service : done
-
-//TODO: create a method to get the list of kurdish names : half done
-
-//TODO: render the list of users to the screen
+  // varibale to change the gender for list of names
+  String gender = 'F';
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,16 @@ class KurdishNamesList extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Gender '),
+                GestureDetector(
+                  child: Text('Gender '),
+                  onTap: () => setState(() {
+                    if (gender == 'M') {
+                      gender = 'F';
+                    } else if (gender == 'F') {
+                      gender = 'M';
+                    }
+                  }),
+                ),
                 Text('Sort by '),
                 Text('Limit '),
               ],
@@ -41,10 +51,10 @@ class KurdishNamesList extends StatelessWidget {
               child: Directionality(
                 textDirection: TextDirection.rtl,
                 child: FutureBuilder<KurdishNames>(
-                  future: _namesService.fetchListOfNames(),
+                  future: _namesService.fetchListOfNames(gender),
                   builder: ((context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CupertinoActivityIndicator();
+                      return Text('loading...');
                     } else if (snapshot.hasError) {
                       return Text(snapshot.error.toString());
                     } else if (snapshot.data == null) {
@@ -53,12 +63,48 @@ class KurdishNamesList extends StatelessWidget {
                     return ListView.builder(
                         itemCount: snapshot.data!.names.length,
                         itemBuilder: (context, index) {
+                          Name _name = snapshot.data!.names[index];
+
                           return ExpansionTile(
-                            leading: Text(snapshot
-                                .data!.names[index].positive_votes
-                                .toString()),
-                            title: Text(snapshot.data!.names[index].name),
-                            children: [Text(snapshot.data!.names[index].desc)],
+                            leading: SelectableText(_name.nameId.toString()),
+                            title: Text(_name.name),
+                            children: [
+                              Text(_name.desc),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton.icon(
+                                      onPressed: () async {
+                                        await _namesService
+                                            .voteUp(
+                                                name_id:
+                                                    _name.nameId.toString())
+                                            .then((value) {
+                                          setState(() {});
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.green),
+                                      icon: Icon(Icons.thumb_up_sharp),
+                                      label: Text(
+                                          _name.positive_votes.toString())),
+                                  ElevatedButton.icon(
+                                      onPressed: () {},
+                                      style: ElevatedButton.styleFrom(
+                                          primary: Colors.red),
+                                      icon: Icon(Icons.thumb_down_sharp),
+                                      label: Row(
+                                        children: [
+                                          Text(_name.negative_votes.toString()),
+                                        ],
+                                      )),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                            ],
                           );
                         });
                   }),
