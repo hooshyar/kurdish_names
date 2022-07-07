@@ -28,12 +28,35 @@ class KurdishNamesService {
     return _kurdishNames;
   }
 
-  //to vote up
+//to use vote up without making things complicated
   Future voteUp({required String name_id}) async {
     await http.post(Uri.parse("https://nawikurdi.com/api/vote"), body: {
       "name_id": name_id,
       "uid": "sdafadsdsafsdfasd",
       "impact": "positive"
+    });
+  }
+
+//to use vote down without making things complicated
+  Future voteDown({required String name_id}) async {
+    await http.post(Uri.parse("https://nawikurdi.com/api/vote"), body: {
+      "name_id": name_id,
+      "uid": "sdafadsdsafsdfasd",
+      "impact": "negative"
+    });
+  }
+
+  //to have both functionalities on one method
+  Future vote({
+    required String name_id,
+    required bool isPositive,
+  }) async {
+    String _impact = isPositive == true ? "positive" : "negative";
+
+    await http.post(Uri.parse("https://nawikurdi.com/api/vote"), body: {
+      "name_id": name_id,
+      "uid": "sdafadsdsafsdfasd",
+      "impact": _impact
     });
   }
 }
